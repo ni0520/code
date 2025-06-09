@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>新增筆記</title>
+    <link href="/css/main.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <h1>新增筆記</h1>
+    <form method="POST" action="/notes">
+      <div>
+        <label>標題：</label>
+        <input type="text" name="title" required>
+      </div>
+      <div>
+        <label>內容：</label>
+        <textarea name="content" rows="5" cols="30" required></textarea>
+      </div>
+      <button type="submit">儲存</button>
+      <a href="/notes">取消</a>
+    </form>
+  </body>
+</html>
