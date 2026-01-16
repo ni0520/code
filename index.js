@@ -4,7 +4,11 @@ const path = require('path');
 const app = express();
 const ejs = require('ejs');
 const haikus = require('./haikus.json');
+const { initializeAnalytics } = require('./lib/analytics');
 const port = process.env.PORT || 3000;
+
+// Initialize Vercel Web Analytics
+initializeAnalytics();
 
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
