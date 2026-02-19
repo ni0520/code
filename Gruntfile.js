@@ -1,5 +1,5 @@
 module.exports = function (grunt) {
-  const { spawnSync } = require('child_process');
+  const { spawn, spawnSync } = require('child_process');
   const fs = require('fs');
   const path = require('path');
 
@@ -28,23 +28,30 @@ module.exports = function (grunt) {
 
   grunt.registerTask('check', ['syntax', 'validate-json']);
 
-  grunt.registerTask('serve', 'Run app with check before start', () => {
-    grunt.task.run(['check']);
-
-    const done = grunt.task.current.async();
-    const appProcess = spawnSync('npm', ['start'], {
+  grunt.registerTask('start-app', 'Start the app process', function () {
+    const done = this.async();
+    const appProcess = spawn('npm', ['start'], {
       cwd: __dirname,
       stdio: 'inherit',
       shell: true
     });
 
-    if (appProcess.status !== 0) {
-      done(false);
-      return;
-    }
+    const shutdown = () => {
+      if (!appProcess.killed) {
+        appProcess.kill('SIGTERM');
+      }
+    };
 
-    done();
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
+
+    appProcess.on('exit', (code) => {
+      process.off('SIGINT', shutdown);
+      process.off('SIGTERM', shutdown);
+      done(code === 0);
+    });
   });
 
+  grunt.registerTask('serve', ['check', 'start-app']);
   grunt.registerTask('default', ['check']);
 };
