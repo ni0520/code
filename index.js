@@ -16,7 +16,8 @@ const notesPath = path.join(__dirname, 'notes.json');
 function loadNotes() {
   try {
     const data = fs.readFileSync(notesPath, 'utf8');
-    notes = JSON.parse(data);
+    const parsedNotes = JSON.parse(data);
+    notes = Array.isArray(parsedNotes) ? parsedNotes : [];
   } catch (err) {
     notes = [];
   }
@@ -48,7 +49,15 @@ app.post('/notes', (req, res) => {
   res.redirect('/notes');
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${port} is already in use. Please stop the existing process or set a different PORT.`);
+    process.exit(1);
+  }
+
+  throw err;
+});
